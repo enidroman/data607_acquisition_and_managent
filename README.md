@@ -1,7 +1,7 @@
 # data607_acquisition_and_managment
 Data 607 Acquisition and Management
 
-Voter Registration During Pandemic
+Assignment #1 Basic Loading and Transformation: Voter Registration During Pandemic
 
 This repository contains data from the article Voter Registration Are Way, Way Down During The Pandemic, June 20, 2020 by Kaleigh Rogers and Nathaniel Rakich. https://fivethirtyeight.com/features/voter-registrations-are-way-way-down-during-the-pandemic/
 
