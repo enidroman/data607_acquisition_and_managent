@@ -1,0 +1,115 @@
+---
+title: "Data_606_Assignment_4_Working_with_Tidy_Data.Rmd"
+author: "Enid Roman"
+date: "2022-10-04"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Upload the libraries needed.
+
+library(tidyr)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+# Import the data from github. 
+# Link is provided to the csv file below:
+# https://github.com/enidroman/data_607_data_acquisition_and_management
+
+urlfile <- "https://raw.githubusercontent.com/enidroman/data_607_data_acquisition_and_management/main/Tidying%20and%20Transforming%20Data.csv"
+
+table <- read.csv(urlfile)
+table
+
+```
+
+### **DATA CLEANING AND TRANSFORMATION**
+
+#### In observing the table I see that: 
+1. The first 2 columns needs to be renamed, X = Airline, X.1 = Status
+2. There is a blank row that separates the airlines that needs to be removed. 
+3. The airline names needs be brought down to be aligned with the delayed. 
+4. Both columns, Phoenix and Seattle, are characters instead of integers. Commas from the numbers 4,480 and 1,840 have to be removed in order to convert the columns Phoenix and Seattle from character to integer. 
+5. Each variable in the dataset should have its own column. 
+    The cities are listed as separate columns when they should be combined into 1 variable.
+    The X.1 = status column contains values that should be split into 2 separate variables.
+6. The period (.) between Los Angeles, San Diego, and San Francisco needs to be replaced by a space. 
+
+```{r}
+table2 <- table %>% 
+  rename(AIRLINE = X, STATUS = X.1)   # Renamed column X = AIRLINE and X.1 = STATUS 
+
+table2 <- drop_na(table2)             # Removed blank row that seperates the airlines. 
+
+table2[table2==""]<-NA                # Bring down the Airlines name  to be aligned with the Status Column.
+table2 <- fill(table2, AIRLINE)
+
+table2
+
+```
+
+```{r}
+table2$Phoenix <- as.integer(gsub(",","",table2$Phoenix))   # Removed comma in 4,480 in Phoenix to convert                                                               to Phoenix column to integer.
+sapply(table2, class)                                         
+
+table2$Seattle <- as.integer(gsub(",","",table2$Seattle))   # Removed comma in 1,841 in Seattle to convert                                                               to Seattle column to integer.
+sapply(table2, class)
+```
+
+```{r}
+# Combined all city in City Column while aligning the cities with the airline names. Created a Delayed and On Time column while aligning the numbers with the cities. 
+
+table2 <- table2 %>% 
+  gather(CITY,NUM_FLIGHTS, -AIRLINE, -STATUS) %>%  
+  spread(STATUS, NUM_FLIGHTS)
+
+colnames(table2) <- c('AIRLINE', 'CITY', 'DELAYED', 'ON_TIME')
+
+table2$CITY <- str_replace_all(table2$CITY, "\\.", " ") # Replaced "," between the cities with a space. 
+
+table2
+```
+### **ANALYSIS**
+
+#### Analysis to compare the arrival delays for the two airlines.
+
+```{r}
+table3 <- table2                             # Created a dataframe with just Airline, City, and Delayed.
+select(table2, AIRLINE, CITY, DELAYED)
+flights_delayed <- table3
+```
+#### Note: I tried to do a geom point graph of the delays per city for each airline but I was unsuccessful in adding color to the dots to distinguish each airline. 
+
+#### This graph is representing the above data delayed for each airline by cities. The longest delay was with AM West with Phoenix and with Alsaska was Seattle. 
+
+```{r}
+#ggplot(data = flights_delayed) + 
+ # geom_bar(mapping = aes(x = CITY, y = DELAYED, fill = AIRLINE), position = "dodge")
+
+ggplot(data = flights_delayed, mapping = aes(x = CITY, y = DELAYED, fill = AIRLINE), position = "dodge") + 
+  geom_point()
+```
+#### Here you can see that AM WEST had 286 more delays then Alaska. That is an average of 57.2 more then Alaska. AM WEST had a median of 117 delays vs 62 delays of Alaska and a minimum of 61 delays vs 12 delays of Alaska, and max of 415 delays vs 305 delays of Alaska. More investigation has to be done to find the reason behind the delays in AM West. 
+
+```{r}
+flights_delayed %>%                           # Summary of delays for each airline.                
+  group_by(AIRLINE) %>%                       
+  summarise(TOTAL_DELAYS = sum(DELAYED),      # Total sum of delays for each airline.
+            AVG_NUM_DELAYS = mean(DELAYED),   # Average of delays for each airline.
+            MEDIAN_DELAYS = median(DELAYED),  # The median of delays for each airline.
+            MIN_DELAYS = min(DELAYED),        # The minimum of delays for each airline. 
+            MAX_DELAYS = max(DELAYED))        # The maximum of delays for each airline. 
+```
+
+
+
+
