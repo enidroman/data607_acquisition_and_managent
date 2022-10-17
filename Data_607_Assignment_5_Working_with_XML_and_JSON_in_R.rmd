@@ -1,0 +1,218 @@
+---
+title: "Data_607_Assignment_5_Working_with_XML_and_JSON_in_R"
+author: "Enid Roman"
+date: "2022-10-16"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### XML was designed to describe data and to focus on what data is. HTML was designed to display data and to focus on how data looks. In other words, HTML is about displaying information, XML is about describing information.
+
+### The tags used to markup HTML documents and the structure of HTML documents are predefined. The author of HTML documents can only use tags that are defined in the HTML standard. On the other hand XML allows the author to define his own tags and his own document structure.
+
+### JSON is a data interchange format and only provides a data encoding specification.
+
+### Here we will do a comparison of the three, HTML, XML, and JSON.
+
+
+### **LOADED THE NECESSARY LIBRARIES NEEDED**
+
+```{r}
+library(tidyverse)
+library(XML)
+library(rvest)
+library(RCurl)
+library(jsonlite)
+library(RJSONIO)
+library(rjson)
+
+```
+
+### **CREATED THREE FILES , HTML, XML, AND JSON FORMATS IN VISUAL STUDIO CODE**
+
+### **HTML CREATED**
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Enid Roman">
+    <title>My Books</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publisher</th>
+            <th>Year</th>
+            <th>Edition</th>
+            <th>ISBN</th>
+        </tr>
+        <tr>
+            <td>R Graphics Cookbook</td>
+            <td>Winston Chang</td>
+            <td>O'Reilly Media Inc</td>
+            <td>2019</td>
+            <td>2nd</td>
+            <td>978-1-4919-7860-3</td>
+        </tr>
+        <tr>
+            <td>R for Everyone</td>
+            <td>Jared P. Lander</td>
+            <td>Addison-Wesley Professional</td>
+            <td>2014</td>
+            <td>2nd</td>
+            <td>978-0-1345-4692-6</td>
+        </tr>
+        <tr>
+            <td>Data Science for Business</td>
+            <td>Foster Provost, Tom Fawcett</td>
+            <td>O'Reilly Media Inc.</td>
+            <td>2013</td>
+            <td>1st</td>
+            <td>978-1-4493-6132-7</td>
+        </tr>
+    </table>
+</body>
+</html>
+
+### **XML CREATED**
+
+<?xml version="1.0" encoding="UTF-8"?>
+<My_Books>
+    <Book ID ="1">
+        <Title>R Graphics Cookbook</Title>
+        <Author>Winston Chang</Author>
+        <Publisher>O'Reilly Media Inc</Publisher>
+        <Year>2019</Year>
+        <Edition>2nd</Edition>
+        <ISBN>078-1-4919-7860-3</ISBN>
+    </Book>   
+     <Book ID = "2">
+        <Title>R for Everyonek</Title>
+        <Author>Jared P. Lander</Author>
+        <Publisher>Addison-Wesley Professional</Publisher>
+        <Year>2014</Year>
+        <Edition>2nd</Edition>
+        <ISBN>978-0-1345-4692-6</ISBN>
+    </Book>
+    <Book ID = "3">
+        <Title>Data Science for Business</Title>
+        <Author>Foster Provost, Tom Fawcett</Author>
+        <Publisher>O'Reilly Media Inc.</Publisher>
+        <Year>2013</Year>
+        <Edition>1st</Edition>
+        <ISBN>978-1-4493-6132-7</ISBN>
+    </Book>
+</My_Books>
+
+### **JSON CREATED**
+
+{"My_Books" :[
+    {
+        "Title" : "R Graphics Cookbook",
+        "Author" : "Winston Chang",
+        "Publisher" : "O'Reilly Media Inc",
+        "Year" : "2019",
+        "Edition" : "2nd",
+        "ISBN" : "978-1-4919-7860-3"
+    },
+    {
+        "Title" : "R for Everyone",
+        "Author" : "Jared P. Lander",
+        "Publisher" : "Addison-Wesley Professional",
+        "Year" : "2014",
+        "Edition" : "2nd",
+        "ISBN" : "978-0-1345-4692-6"
+    },
+    {   
+        "Title" : "Data Science for Business",
+        "Authors" : ["Foster Provost", "Tom Fawcett"],
+        "Publisher" : "O'Reilly Media Inc.",
+        "Year" : "2013",
+        "Edition" : "1st",
+        "ISBN" : "978-1-4493-6132-7"
+    }]
+} 
+
+### **IMPORT DATA FROM FILE**
+
+### **HTML**
+
+#### The following actions are performed to load the HTML table into R as dataframe:
+
+####    Used getURL function to extract the link of the html file.
+####    Parsed the html file with read_html function.
+####    Used html_table function to extract a list of tables if any from the html file and convert the tables                 into dataframes.
+####    Only one table in the html file, therefore the first element of the list is returned.
+
+```{r}
+url <- getURL('https://raw.githubusercontent.com/enidroman/data_607_data_acquisition_and_management/main/books.html')
+df_HTML <- url %>%
+  read_html(encoding = 'UTF-8') %>%
+  html_table(header = NA, trim = TRUE) %>%
+  .[[1]]
+
+df_HTML
+```
+
+### **XML**
+
+#### The following actions are performed to load the HTML table into R as dataframe:
+
+####    Parsed values in all elements into R dataframe.
+####    Parsed the XML table into R named df_XML using xmlParse function.
+####    Find the root node of the parsed file using xmlRoot function.
+####    Convert the XML table to dataframe using function xmlToDataFrame
+
+```{r}
+url <- getURL('https://raw.githubusercontent.com/enidroman/data_607_data_acquisition_and_management/main/books.xml')
+df_XML <- url %>%
+  xmlParse() %>%
+  xmlRoot() %>%
+  xmlToDataFrame(stringsAsFactors = FALSE)
+df_XML
+
+```
+
+
+### **JSON**
+
+### Below I know it is incorrect. If you see below this chunk I tried parcing the github and it wouldn't work for the life of me. Even Melvin was trying to help me figure it out. But we were unsucessful. Mayby you can tell us what we were doing wrong. 
+
+```{r}
+df_JSON <- rjson::fromJSON(file = "books.json")
+df_JSON = as.data.frame(df_JSON)
+df_JSON
+```
+
+
+
+```{r}
+#json_books <- fromJSON("https://raw.githubusercontent.com/enidroman/data_607_data_acquisition_and_management/main/books.json")$My_books
+#json_books
+```
+
+
+### **COMPARISON**
+
+### HTML AND XML
+### HTML and XML tables seems identical. The only diffence is when parcing numeric values from source file to dataframe. The data type for "Year" is different in HTML and XML. In HTML "Year" is an integer, while XML "Year" is a character. 
+
+
+```{r}
+all.equal(df_HTML,df_XML)
+```
+
+```{r}
+all.equal(df_HTML$Year, as.integer(df_XML$Year))
+```
+
