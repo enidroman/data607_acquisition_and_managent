@@ -1,0 +1,94 @@
+---
+title: "Data_607_Assign_6_Web_APIs_rmd"
+author: "Enid Roman"
+date: "2022-10-30"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### The New York Times web site provides a rich set of APIs, as described here: https://developer.nytimes.com/apis I need to start by signing up for an API key at https://developer.nytimes.com/apis. My task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it into an R DataFrame.
+
+### In the website https://developer.nytimes.com/apis, I chose Books API. This API provides information about book reviews and The New York Times Best Sellers lists. I specifically chose the hardcover fiction books published on 12/19/2015. My API key is, 9Lw2tR3uDWImY2ScuKheW7cBa49SrOrG and my url is https://api.nytimes.com/svc/books/v3/lists/2015-12-19/hardcover-fiction.json. 
+
+```{r}
+# Uploaded libraries.
+
+library(httr)
+library(RCurl)
+library(jsonlite)
+library(RJSONIO)
+library(rjson)
+library(tidyverse)
+```
+
+###  Using The NY Time Books API I created the url for the best seller hardcover fiction books published on 12/19/2015 and added the access key and combined url and the key with the paste function. 
+
+
+```{r}
+enid_url <- 'https://api.nytimes.com/svc/books/v3/lists/2015-12-19/hardcover-fiction.json'
+
+enid_api_key <- '9Lw2tR3uDWImY2ScuKheW7cBa49SrOrG'
+
+enid_paste <- paste(enid_url,'?api-key=',enid_api_key, sep = '')
+```
+
+
+
+```{r}
+# Calling the API.
+
+raw_review <- httr::GET(enid_paste)
+```
+
+
+
+```{r}
+# Checking if API was called in successful.
+raw_review$status_code
+```
+
+```{r}
+# Checked current raw state. 
+
+api_raw <- rawToChar(raw_review$content)
+
+api_raw
+```
+
+```{r}
+# Read content in JSON format and de-serializes it into R objects. Flattening function remove a level hierarchy from a list (like unlist function).
+
+api_json_list <- jsonlite::fromJSON(api_raw, flatten=TRUE)
+
+api_json_list
+```
+
+
+```{r}
+# Created dataframe from json format and checked class for success.
+
+df_book <- data.frame(api_json_list$results$books)
+class(df_book)
+```
+```{r}
+df_book
+```
+
+```{r}
+# Checked columns name to see which I would need to keep. 
+
+colnames(df_book)
+```
+```{r}
+# Limited the columns I wanted to use. 
+
+df_books <- df_book[, c("rank", "title", "author", "publisher", "primary_isbn13", "amazon_product_url")]
+
+df_books
+```
+#### Obtaing an API key from a website is a necessary skill to learn in data analysis. Without an API key there is no path to collect the data that is needed. It is quite challenging to learn the steps to obtain an API key but with a couple of tutorials I was able to accomplish in getting the API I needed. Getting the url format correctly was also a challenge. Using the flatten function to change the content from raw to dataframe was also a challenge. Using obtaining the APIs on the website, https://developer.nytimes.com/apis, was simple and instructions was easy to follow.
