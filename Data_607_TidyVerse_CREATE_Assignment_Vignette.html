@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Enid Roman" />
+
+<meta name="date" content="2022-10-30" />
+
+<title>Data_607_TidyVerse_CREATE_Assignment_Vignette.rmd</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Data_607_TidyVerse_CREATE_Assignment_Vignette.rmd</h1>
+<h4 class="author">Enid Roman</h4>
+<h4 class="date">2022-10-30</h4>
+
+
+
+<p>###<strong>INTRODUCTION</strong></p>
+<div id="which-state-has-the-worst-drivers" class="section level4">
+<h4>Which State Has The Worst Drivers?</h4>
+<p>###<strong>DATA BACKGROUND</strong></p>
+</div>
+<div id="this-dataset-bad-drivers-is-from-fivethirtyeight.-this-data-shows-americas-bad-drivers-in-all-the-states-involved-in-collisions." class="section level4">
+<h4>This dataset, “bad-drivers” is from Fivethirtyeight. This data shows
+America’s bad drivers in all the states, involved in collisions.</h4>
+</div>
+<div id="the-data-contains-the-following-fields" class="section level4">
+<h4>The data contains the following fields:</h4>
+</div>
+<div id="state" class="section level4">
+<h4>State</h4>
+</div>
+<div id="number-of-drivers-involved-in-fatal-collisions-per-billion-miles" class="section level4">
+<h4>Number of drivers involved in fatal collisions per billion
+miles</h4>
+</div>
+<div id="percentage-of-drivers-involved-in-fatal-collisions-who-were-speeding" class="section level4">
+<h4>Percentage Of Drivers Involved In Fatal Collisions Who Were
+Speeding</h4>
+</div>
+<div id="percentage-of-drivers-involved-in-fatal-collisions-who-were-alcohol-impaired" class="section level4">
+<h4>Percentage Of Drivers Involved In Fatal Collisions Who Were
+Alcohol-Impaired</h4>
+</div>
+<div id="percentage-of-drivers-involved-in-fatal-collisions-who-were-not-distracted" class="section level4">
+<h4>Percentage Of Drivers Involved In Fatal Collisions Who Were Not
+Distracted</h4>
+</div>
+<div id="percentage-of-drivers-involved-in-fatal-collisions-who-had-not-been-involved-in-any-previous-accidents" class="section level4">
+<h4>Percentage Of Drivers Involved In Fatal Collisions Who Had Not Been
+Involved In Any Previous Accidents</h4>
+</div>
+<div id="car-insurance-premiums-losses-incurred-by-insurance-companies-for-collisions-per-insured-driver" class="section level4">
+<h4>Car Insurance Premiums (<span class="math inline">\() #### Losses
+incurred by insurance companies for collisions per insured driver
+(\)</span>)</h4>
+<p>###<strong>RESOURCES</strong></p>
+</div>
+<div id="data-is-collected-by-the-national-highway-traffic-safety-administration-2009-and-2012-nhtsa-httpswww-fars.nhtsa.dot.govmainindex.aspx-and-national-association-of-insurance-commissioners-2010-2011website-was-not-provided." class="section level4">
+<h4>Data is collected by the National Highway Traffic Safety
+Administration 2009 and 2012 (NHTSA) (<a href="https://www-fars.nhtsa.dot.gov/Main/index.aspx" class="uri">https://www-fars.nhtsa.dot.gov/Main/index.aspx</a>) and
+National Association of Insurance Commissioners 2010 &amp; 2011(website
+was not provided).</h4>
+</div>
+<div id="data-is-by-mona-chalabi-from-fivethirtyeight-and-is-available-online-here-httpsgithub.comfivethirtyeightdatatreemasterbad-drivers-for-this-project-the-data-was-uploaded-by-calling-the-url-and-using-the-read_table-function." class="section level4">
+<h4>Data is by Mona Chalabi from FiveThirtyEight and is available online
+here: <a href="https://github.com/fivethirtyeight/data/tree/master/bad-drivers" class="uri">https://github.com/fivethirtyeight/data/tree/master/bad-drivers</a>
+For this project, the data was uploaded by calling the URL and using the
+read_table() function.</h4>
+<p>###<strong>PACKAGES</strong></p>
+</div>
+<div id="package-used-is-tidyverse.-it-includes-readr-dplyr-tidyr-ggplot2-stringr-tibble-forcats-and-purr-packages." class="section level4">
+<h4>Package used is tidyverse. It includes readr, dplyr, tidyr, ggplot2,
+stringr, tibble, forcats and purr packages.</h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Upload tidyverse, ggplot2, and dplyr libraries.</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ ggplot2 3.3.6     ✔ purrr   0.3.4</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ tibble  3.1.8     ✔ dplyr   1.0.9</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ tidyr   1.2.0     ✔ stringr 1.4.1</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✔ readr   2.1.2     ✔ forcats 0.5.2</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(infer)</span></code></pre></div>
+<p>###<strong>ANALYSIS</strong></p>
+<p>###<strong>SECTION 1:LOAD THE DATA</strong></p>
+</div>
+<div id="read_csv-function-is-from-readr-package-used-for-reading-flat-file-data-with-comma-separated-values." class="section level4">
+<h4>read_csv() function is from readr package, used for reading flat
+file data with comma separated values.</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the dataset from fivethirtyeight.com and read the dataset with read.csv.</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>theUrl <span class="ot">&lt;-</span> <span class="st">&quot;https://raw.githubusercontent.com/fivethirtyeight/data/master/bad-drivers/bad-drivers.csv&quot;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>worst_drivers <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="at">file=</span>theUrl, <span class="at">header=</span><span class="cn">TRUE</span>, <span class="at">sep=</span><span class="st">&quot;,&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(worst_drivers)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;        State Number.of.drivers.involved.in.fatal.collisions.per.billion.miles</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1    Alabama                                                             18.8</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     Alaska                                                             18.1</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3    Arizona                                                             18.6</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4   Arkansas                                                             22.4</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 California                                                             12.0</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6   Colorado                                                             13.6</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Were.Speeding</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                                                                   39</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                                                                   41</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                                                                   35</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                                                                   18</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                                                                   35</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                                                                   37</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Were.Alcohol.Impaired</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                                                                           30</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                                                                           25</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                                                                           28</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                                                                           26</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                                                                           28</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                                                                           28</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Were.Not.Distracted</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                                                                         96</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                                                                         90</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                                                                         84</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                                                                         94</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                                                                         91</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                                                                         79</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Had.Not.Been.Involved.In.Any.Previous.Accidents</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                                                                                                     80</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                                                                                                     94</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                                                                                                     96</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                                                                                                     95</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                                                                                                     89</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                                                                                                     95</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Car.Insurance.Premiums....</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                     784.55</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                    1053.48</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                     899.47</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                     827.34</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                     878.41</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                     835.50</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Losses.incurred.by.insurance.companies.for.collisions.per.insured.driver....</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1                                                                       145.08</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2                                                                       133.93</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3                                                                       110.35</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4                                                                       142.39</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5                                                                       165.63</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6                                                                       139.91</span></span></code></pre></div>
+<p>###<strong>SECTION 2: EXPLORATORY DATA ANALYSIS/CHECKING
+ASSUMPTION</strong> ###<strong>SECTION 3: SUMMARY
+STATISTICS</strong></p>
+</div>
+<div id="glimpse-function-is-from-tibble-package-used-to-see-column-names-how-many-rows-how-many-columns-and-type-of-variables-in-a-data-frame" class="section level4">
+<h4>glimpse() function is from tibble package, used to see column names,
+how many rows, how many columns, and type of variables in a data
+frame</h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Checking the columns name and how many rows and columns and variables type in that particular column. </span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(worst_drivers)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 51</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 8</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ State                                                                                                  &lt;chr&gt; …</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Number.of.drivers.involved.in.fatal.collisions.per.billion.miles                                       &lt;dbl&gt; …</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Were.Speeding                                   &lt;int&gt; …</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Were.Alcohol.Impaired                           &lt;int&gt; …</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Were.Not.Distracted                             &lt;int&gt; …</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Percentage.Of.Drivers.Involved.In.Fatal.Collisions.Who.Had.Not.Been.Involved.In.Any.Previous.Accidents &lt;int&gt; …</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Car.Insurance.Premiums....                                                                             &lt;dbl&gt; …</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ Losses.incurred.by.insurance.companies.for.collisions.per.insured.driver....                           &lt;dbl&gt; …</span></span></code></pre></div>
+</div>
+<div id="colnames-is-from-dplyr-package.-is-used-to-obtain-or-set-the-names-of-the-row-and-column-of-a-matrix-like-object-respectively." class="section level4">
+<h4>colnames() is from dplyr package. Is used to obtain or set the names
+of the row and column of a matrix-like object, respectively.</h4>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename the columns for easier reading.</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(worst_drivers) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;STATE&quot;</span>, </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;DRIVERS_INVOLVED&quot;</span>, </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;PERC_DRIVERS_SPEED&quot;</span>, </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;PERC_DRIVERS_ALCHO&quot;</span>, </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;PERC_DRIVERS_NOT_DIST&quot;</span>, </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;PERC_DRIVERS_NO_ACC&quot;</span>, </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;INS_PREM&quot;</span>, </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                           <span class="st">&quot;LOSS_INSCOMP&quot;</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(worst_drivers)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 51</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 8</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ STATE                 &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;Cal…</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ DRIVERS_INVOLVED      &lt;dbl&gt; 18.8, 18.1, 18.6, 22.4, 12.0, 13.6, 10.8, 16.2, …</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_SPEED    &lt;int&gt; 39, 41, 35, 18, 35, 37, 46, 38, 34, 21, 19, 54, …</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_ALCHO    &lt;int&gt; 30, 25, 28, 26, 28, 28, 36, 30, 27, 29, 25, 41, …</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_NOT_DIST &lt;int&gt; 96, 90, 84, 94, 91, 79, 87, 87, 100, 92, 95, 82,…</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_NO_ACC   &lt;int&gt; 80, 94, 96, 95, 89, 95, 82, 99, 100, 94, 93, 87,…</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ INS_PREM              &lt;dbl&gt; 784.55, 1053.48, 899.47, 827.34, 878.41, 835.50,…</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ LOSS_INSCOMP          &lt;dbl&gt; 145.08, 133.93, 110.35, 142.39, 165.63, 139.91, …</span></span></code></pre></div>
+</div>
+<div id="data-wranglingvisualization-using-dplyr-tidyr-and-ggplot2" class="section level3">
+<h3><strong>DATA WRANGLING/VISUALIZATION USING DPLYR, TIDYR, AND
+GGPLOT2</strong></h3>
+<div id="columns-perc_drivers_speed-perc_drivers_alcho-perc_drivers_not_dist-perc_drivers_no_acc-are-percentages-of-drivers_involved.-i-will-mutate-new-columns-drivers_speed-drivers_alcho-drivers_not_dist-drivers_no_acc-by-taking-the-given-percentage-of-drivers_involved-column." class="section level4">
+<h4>Columns PERC_DRIVERS_SPEED, PERC_DRIVERS_ALCHO,
+PERC_DRIVERS_NOT_DIST, PERC_DRIVERS_NO_ACC are percentages of
+DRIVERS_INVOLVED. I will mutate new columns DRIVERS_SPEED,
+DRIVERS_ALCHO, DRIVERS_NOT_DIST, DRIVERS_NO_ACC by taking the given
+percentage of DRIVERS_INVOLVED column.</h4>
+</div>
+<div id="mutate-function-is-from-dplyr-package-adds-new-variables-and-preserves-existing-ones." class="section level4">
+<h4>mutate() function is from dplyr package, adds new variables and
+preserves existing ones.</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create new column DRIVERS_SPEED which will be (DRIVERS_INVOLVED*PERC_DRIVERS_SPEED)/100</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>percent_worst_drivers <span class="ot">&lt;-</span> worst_drivers <span class="sc">%&gt;%</span> </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DRIVERS_SPEED=</span>(DRIVERS_INVOLVED<span class="sc">*</span>PERC_DRIVERS_SPEED)<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DRIVERS_ALCHO=</span>(DRIVERS_INVOLVED<span class="sc">*</span>PERC_DRIVERS_ALCHO)<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DRIVERS_NOT_DIST=</span>(DRIVERS_INVOLVED<span class="sc">*</span>PERC_DRIVERS_NOT_DIST)<span class="sc">/</span><span class="dv">100</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DRIVERS_NO_ACC=</span>(DRIVERS_INVOLVED<span class="sc">*</span>PERC_DRIVERS_NO_ACC)<span class="sc">/</span><span class="dv">100</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(percent_worst_drivers)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Rows: 51</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Columns: 12</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ STATE                 &lt;chr&gt; &quot;Alabama&quot;, &quot;Alaska&quot;, &quot;Arizona&quot;, &quot;Arkansas&quot;, &quot;Cal…</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ DRIVERS_INVOLVED      &lt;dbl&gt; 18.8, 18.1, 18.6, 22.4, 12.0, 13.6, 10.8, 16.2, …</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_SPEED    &lt;int&gt; 39, 41, 35, 18, 35, 37, 46, 38, 34, 21, 19, 54, …</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_ALCHO    &lt;int&gt; 30, 25, 28, 26, 28, 28, 36, 30, 27, 29, 25, 41, …</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_NOT_DIST &lt;int&gt; 96, 90, 84, 94, 91, 79, 87, 87, 100, 92, 95, 82,…</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ PERC_DRIVERS_NO_ACC   &lt;int&gt; 80, 94, 96, 95, 89, 95, 82, 99, 100, 94, 93, 87,…</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ INS_PREM              &lt;dbl&gt; 784.55, 1053.48, 899.47, 827.34, 878.41, 835.50,…</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ LOSS_INSCOMP          &lt;dbl&gt; 145.08, 133.93, 110.35, 142.39, 165.63, 139.91, …</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ DRIVERS_SPEED         &lt;dbl&gt; 7.332, 7.421, 6.510, 4.032, 4.200, 5.032, 4.968,…</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ DRIVERS_ALCHO         &lt;dbl&gt; 5.640, 4.525, 5.208, 5.824, 3.360, 3.808, 3.888,…</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ DRIVERS_NOT_DIST      &lt;dbl&gt; 18.048, 16.290, 15.624, 21.056, 10.920, 10.744, …</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $ DRIVERS_NO_ACC        &lt;dbl&gt; 15.040, 17.014, 17.856, 21.280, 10.680, 12.920, …</span></span></code></pre></div>
+<p>###<strong>SECTION 4: VISUALIZING THE RESULTS</strong></p>
+</div>
+<div id="create-a-stacked-bar-plot-using-ggplot-method-having-states-on-x-axis-and-drivers_speed-and-drivers_involved-stacked-together-on-y-axis.-we-use-select-method-to-get-required-columns.-the-gather-method-to-make-data-long-for-drivers_involved-and-drivers_speed-and-finally-use-ggplot-to-draw-stacked-bar-plot." class="section level4">
+<h4>Create a stacked bar plot using ggplot() method having states on X
+axis and DRIVERS_SPEED and DRIVERS_INVOLVED stacked together on Y axis.
+We use select() method to get required columns. The gather() method to
+make data long for DRIVERS_INVOLVED and DRIVERS_SPEED and finally use
+ggplot() to draw stacked bar plot.</h4>
+</div>
+<div id="select-function-is-from-dplyr-package-that-keeps-only-the-variables-we-mention." class="section level4">
+<h4>select() function is from dplyr package that keeps only the
+variables we mention.</h4>
+</div>
+<div id="gather-function-is-from-tidyr-package-that-takes-multiple-columns-and-collapses-into-key-value-pairs-duplicating-all-other-columns-as-needed." class="section level4">
+<h4>gather() function is from tidyr package that takes multiple columns
+and collapses into key-value pairs, duplicating all other columns as
+needed.</h4>
+</div>
+<div id="ggplot-all-ggplot2-plots-begin-with-a-call-to-ggplot." class="section level4">
+<h4>ggplot() All ggplot2 plots begin with a call to ggplot().</h4>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>percent_worst_drivers <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(STATE, DRIVERS_INVOLVED, DRIVERS_SPEED) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>(type, value, DRIVERS_INVOLVED<span class="sc">:</span>DRIVERS_SPEED) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(., <span class="fu">aes</span>(<span class="at">x =</span> STATE,<span class="at">y =</span> value, <span class="at">fill =</span> type)) <span class="sc">+</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>, <span class="at">stat=</span><span class="st">&quot;identity&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;red&quot;</span>, <span class="st">&quot;darkred&quot;</span>)) <span class="sc">+</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Drivers involved in Fatal collision while Speeding&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x=</span><span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">90</span>,<span class="at">hjust=</span><span class="dv">1</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="below-plot-of-for-state-vs-ins_premium-that-used-ggplot-method-to-creat-a-bar-plot." class="section level4">
+<h4>Below plot of for STATE vs INS_PREMIUM that used ggplot() method to
+creat a bar plot.</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>percent_worst_drivers <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(., <span class="fu">aes</span>(<span class="at">x =</span> STATE,<span class="at">y =</span> INS_PREM)) <span class="sc">+</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>, <span class="at">stat=</span><span class="st">&quot;identity&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Car Insurance Premium&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x=</span><span class="fu">element_text</span>(<span class="at">angle=</span><span class="dv">90</span>,<span class="at">hjust=</span><span class="dv">1</span>,<span class="at">vjust=</span><span class="fl">0.5</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>###<strong>CONCLUSION</strong></p>
+</div>
+<div id="i-discussed-various-packages-and-their-functions-to-explore-bad-drivers-dataset.-for-complete-set-details-refer-httpswww.tidyverse.org." class="section level4">
+<h4>I discussed various packages and their functions to explore bad
+drivers dataset. For complete set details refer (<a href="https://www.tidyverse.org/" class="uri">https://www.tidyverse.org/</a>).</h4>
+</div>
+<div id="resources" class="section level4">
+<h4><strong>Resources</strong>:</h4>
+</div>
+<div id="httpswww.tidyverse.orgpackages" class="section level4">
+<h4><a href="https://www.tidyverse.org/packages/" class="uri">https://www.tidyverse.org/packages/</a></h4>
+</div>
+<div id="httpsfivethirtyeight.comfeatureswhich-state-has-the-worst-drivers" class="section level4">
+<h4><a href="https://fivethirtyeight.com/features/which-state-has-the-worst-drivers/" class="uri">https://fivethirtyeight.com/features/which-state-has-the-worst-drivers/</a></h4>
+<p>###<strong>SESSION INFORMATION</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">width =</span> <span class="dv">100</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">session_info</span>()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ─ Session info ───────────────────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  setting  value</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  version  R version 4.2.1 (2022-06-23 ucrt)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  os       Windows 10 x64 (build 19043)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  system   x86_64, mingw32</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ui       RTerm</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  language (EN)</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  collate  English_United States.utf8</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ctype    English_United States.utf8</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  tz       America/New_York</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  date     2022-10-30</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  pandoc   2.18 @ C:/Program Files/RStudio/bin/quarto/bin/tools/ (via rmarkdown)</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ─ Packages ───────────────────────────────────────────────────────────────────────────────────────</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  package       * version date (UTC) lib source</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  assertthat      0.2.1   2019-03-21 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  backports       1.4.1   2021-12-13 [1] CRAN (R 4.2.0)</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  broom           1.0.1   2022-08-29 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  bslib           0.4.0   2022-07-16 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  cachem          1.0.6   2021-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  callr           3.7.2   2022-08-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  cellranger      1.1.0   2016-07-27 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  cli             3.3.0   2022-04-25 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  colorspace      2.0-3   2022-02-21 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  crayon          1.5.1   2022-03-26 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  DBI             1.1.3   2022-06-18 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  dbplyr          2.2.1   2022-06-27 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  devtools        2.4.4   2022-07-20 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  digest          0.6.29  2021-12-01 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  dplyr         * 1.0.9   2022-04-28 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ellipsis        0.3.2   2021-04-29 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  evaluate        0.16    2022-08-09 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  fansi           1.0.3   2022-03-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  farver          2.1.1   2022-07-06 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  fastmap         1.1.0   2021-01-25 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  forcats       * 0.5.2   2022-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  fs              1.5.2   2021-12-08 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  gargle          1.2.0   2021-07-02 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  generics        0.1.3   2022-07-05 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ggplot2       * 3.3.6   2022-05-03 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  glue            1.6.2   2022-02-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  googledrive     2.0.0   2021-07-08 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  googlesheets4   1.0.1   2022-08-13 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  gtable          0.3.0   2019-03-25 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  haven           2.5.1   2022-08-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  highr           0.9     2021-04-16 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  hms             1.1.2   2022-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  htmltools       0.5.3   2022-07-18 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  htmlwidgets     1.5.4   2021-09-08 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  httpuv          1.6.5   2022-01-05 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  httr            1.4.4   2022-08-17 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  infer         * 1.0.3   2022-08-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  jquerylib       0.1.4   2021-04-26 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  jsonlite        1.8.0   2022-02-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  knitr           1.40    2022-08-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  labeling        0.4.2   2020-10-20 [1] CRAN (R 4.2.0)</span></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  later           1.3.0   2021-08-18 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  lifecycle       1.0.1   2021-09-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  lubridate       1.8.0   2021-10-07 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  magrittr        2.0.3   2022-03-30 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  memoise         2.0.1   2021-11-26 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  mime            0.12    2021-09-28 [1] CRAN (R 4.2.0)</span></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  miniUI          0.1.1.1 2018-05-18 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  modelr          0.1.9   2022-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  munsell         0.5.0   2018-06-12 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  pillar          1.8.1   2022-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  pkgbuild        1.3.1   2021-12-20 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  pkgconfig       2.0.3   2019-09-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  pkgload         1.3.0   2022-06-27 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  prettyunits     1.1.1   2020-01-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  processx        3.7.0   2022-07-07 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  profvis         0.3.7   2020-11-02 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  promises        1.2.0.1 2021-02-11 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  ps              1.7.1   2022-06-18 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  purrr         * 0.3.4   2020-04-17 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  R6              2.5.1   2021-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  Rcpp            1.0.9   2022-07-08 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  readr         * 2.1.2   2022-01-30 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  readxl          1.4.1   2022-08-17 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  remotes         2.4.2   2021-11-30 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  reprex          2.0.2   2022-08-17 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  rlang           1.0.4   2022-07-12 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  rmarkdown       2.16    2022-08-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  rstudioapi      0.14    2022-08-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  rvest           1.0.3   2022-08-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  sass            0.4.2   2022-07-16 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  scales          1.2.1   2022-08-20 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  sessioninfo     1.2.2   2021-12-06 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  shiny           1.7.2   2022-07-19 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  stringi         1.7.8   2022-07-11 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  stringr       * 1.4.1   2022-08-20 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  tibble        * 3.1.8   2022-07-22 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  tidyr         * 1.2.0   2022-02-01 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  tidyselect      1.1.2   2022-02-21 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  tidyverse     * 1.3.2   2022-07-18 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  tzdb            0.3.0   2022-03-28 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  urlchecker      1.0.1   2021-11-30 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  usethis         2.1.6   2022-05-25 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  utf8            1.2.2   2021-07-24 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  vctrs           0.4.1   2022-04-13 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  withr           2.5.0   2022-03-03 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  xfun            0.32    2022-08-10 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  xml2            1.3.3   2021-11-30 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  xtable          1.8-4   2019-04-21 [1] CRAN (R 4.2.1)</span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  yaml            2.3.5   2022-02-21 [1] CRAN (R 4.2.0)</span></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] C:/Users/enidr/AppData/Local/R/win-library/4.2</span></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [2] C:/Program Files/R/R-4.2.1/library</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ──────────────────────────────────────────────────────────────────────────────────────────────────</span></span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
