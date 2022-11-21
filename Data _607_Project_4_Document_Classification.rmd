@@ -1,0 +1,373 @@
+---
+title: "Data_607_Project_4_Document_Classification"
+author: "Enid Roman"
+date: "2022-11-19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+#### It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam.  
+
+#### For this project, we start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder). One example corpus:   https://spamassassin.apache.org/old/publiccorpus/
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### **LOAD REQUIRED LIBRARIES**
+
+#### Install & load necessary libraries. 
+
+#### TM is R’s text mining package, which provides several functions for text handling, processing and management. The package uses the concept of a ‘corpus’ which is a collection of text documents to operate upon. Text can be stored either in-memory in R via a Volatile Corpus or on an external data store such as a database via a Permanent Corpus.
+
+#### Other packages are supplementary packages that are used for reading lines from file, plotting, preparing word clouds, N-Gram generation, etc.
+
+```{r}
+#install.packages('tm')
+library(tidyverse)
+library(tidyr)                    
+library(dplyr) 
+library(purrr)
+library(stringr)  
+library(stringi)
+library(ggplot2)
+library(readr)
+library(stats) 
+library(magrittr)
+library(R.utils)
+#install.packages("kableExtra")
+library(kableExtra)
+library(tm)
+library(wordcloud)                    
+library(topicmodels)                    
+library(SnowballC)                    
+library(e1071)                    
+library(data.table)  
+#install.packages('quanteda')
+library(quanteda)
+#install.packages('naivebayes')
+library(naivebayes)
+```
+
+### **DATA COLLECTION**
+
+#### Obtained the spam and ham data from Spam Assassin Appache site: https://spamassassin.apache.org/old/publiccorpus/. Went to Public Corpus folder. 
+
+#### Downloaded spam and ham data to use for the document classification exercise. For spam, I downloaded 20030228_spam.tar.bz2 and for ham folder I downloaded 20030228_easy_ham_2.tar.bz2.
+
+#### Unzipped both folders using 7-zip file manager. 
+
+#### Opened both files in Notepad ++ to explore spam and ham emails. 
+
+```{r}
+# Load the spam and ham data into R from my folder in my computer. Had trouble creating the corpus when I used the url. 
+
+#url_spam <- "https://spamassassin.apache.org/old/publiccorpus/20030228_spam.tar.bz2"
+#url_ham <- "https://spamassassin.apache.org/old/publiccorpus/20030228_easy_ham_2.tar.bz2"
+
+pathName_spam <- "C:\\Users\\enidr\\OneDrive\\Documents\\CUNY SPS DATA 607\\Project 4\\spam"
+file_name_spam <- list.files(pathName_spam)
+
+pathName_ham <- "C:\\Users\\enidr\\OneDrive\\Documents\\CUNY SPS DATA 607\\Project 4\\easy_ham_2"
+file_name_ham <- list.files(pathName_ham)
+
+```
+
+#### Got the first number of rows to test if I have the right type of data. 
+
+```{r}
+head(file_name_spam)
+```
+
+```{r}
+head(file_name_ham)
+```
+
+#### Got the length 501 for spam emails and 1401 for non spam (ham) emails 
+
+```{r}
+length_spam <- length(file_name_spam)
+length_spam
+```
+```{r}
+length_ham <- length(file_name_ham)
+length_ham
+```
+#### Obtained the file size, line size, and file words for both spam and ham files. 
+
+```{r}
+file_size <- format(object.size(file_name_spam), units = "Kb")
+file_num_lines <- length(file_name_spam)
+file_words <- sum(stri_count_words(file_name_spam))
+cat (" File Size: ", file_size, " Line Size: ", file_num_lines, " File Words: ", file_words)
+```
+```{r}
+
+file_size <- format(object.size(file_name_ham), units = "Kb")
+file_num_lines <- length(file_name_ham)
+file_words <- sum(stri_count_words(file_name_ham))
+cat (" File Size: ", file_size, " Line Size: ", file_num_lines, " File Words: ", file_words)
+```
+#### Removed the .cmds files from all the files.
+
+```{r}
+file_name_spam <- file_name_spam[which(file_name_spam!="cmds")]
+file_name_ham <- file_name_ham[which(file_name_ham!="cmds")]
+```
+
+#### Used ‘list.files’ on our ‘spam_folder’ object which produces a character vector of the names of files.
+
+```{r}
+spam_email = list.files(path = "spam_file", full.names = TRUE)
+ham_email = list.files(path = "ham_file",full.names = TRUE)
+```
+
+### **Processing Textual Data - Corpus Creation**
+
+#### We need to create a collection of documents (technically referred to as a Corpus) in the R environment. This basically involves loading the files created in the TextMining folder into a Corpus object. The tm package provides the Corpus() function to do this. 
+
+```{r}
+# spam folder files 
+
+spam_corpus <- pathName_spam %>%
+  paste(., list.files(.), sep = "/") %>%
+  lapply(readLines) %>%
+  VectorSource() %>%
+  VCorpus()
+
+spam_corpus
+
+```
+
+```{r}
+# ham folder files 
+
+ham_corpus <- pathName_ham %>%
+  paste(., list.files(.), sep = "/") %>%
+  lapply(readLines) %>%
+  VectorSource() %>%
+  VCorpus()
+
+ham_corpus
+
+```
+
+### **DATA CLEANING**
+
+### **Corpus Cleaning**
+
+##### In terms of cleaning the corpus for each folder we will use the tm package and follow below steps;
+##### Remove the numbers and punctuations
+##### Remove stopwords such as to, from, and, the etc…
+##### Remove blankspaces.
+##### Reduce the terms to their stem.
+
+```{r}
+# spam emails 
+
+spam_corpus <- spam_corpus %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(stemDocument)
+spam_corpus
+
+```
+
+```{r}
+# ham emails 
+
+ham_corpus <- ham_corpus %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(stripWhitespace) %>%
+  tm_map(stemDocument)
+ham_corpus
+
+```
+
+#### Combined both spam and non spam (ham) emails.
+
+```{r}
+spam_or_ham_corpus <- c(spam_corpus, ham_corpus)
+```
+
+### **Building a Term Document Matrix**
+
+```{r}
+tdm <- DocumentTermMatrix(spam_or_ham_corpus)
+tdm
+
+```
+
+### **Creating Word Cloud with Header Text**
+
+```{r}
+wordcloud(spam_or_ham_corpus, max.words = 100, random.order = FALSE, rot.per=0.15, min.freq=5, colors = brewer.pal(8, "Dark2"))
+```
+### **MODEL DEVELOPMENT**
+
+#### A classification such as Naive Bayes classifier is being used to find out the presence of certain features (words) in a defined class to predict if the email is spam or ham.
+
+### **Data Preperation for Model Development**
+
+### **Creating Dataframe**
+
+#### Before we start creating our training and test data sets and process, we need to create a combined dataframe, label the corpus (ham or spam) as part of supervised technique.
+
+```{r}
+df_spam <- as.data.frame(unlist(spam_corpus), stringsAsFactors = FALSE)
+df_spam$type <- "ham"
+colnames(df_spam)=c("text", "email")
+
+df_ham <- as.data.frame(unlist(ham_corpus), stringsAsFactors = FALSE)
+df_ham$type <- "spam"
+colnames(df_ham)=c("text", "email")
+
+df_spam_or_ham <- rbind(df_spam, df_ham)
+
+kable(head(df_spam_or_ham))
+```
+
+#### **Prepare Test and Train Data**
+
+#### **Splitting Test and Train Data**
+
+#### We will split 80% of the data as training data and 30% as the test data.
+
+```{r}
+sample_size <- floor(0.80 * nrow(df_spam_or_ham)) # selecting sample size of 80% of the data for training. 
+
+set.seed(123)
+train <- sample(seq_len(nrow(df_spam_or_ham)), size = sample_size)
+
+train_spam_or_ham <- df_spam_or_ham[train, ]
+test_spam_or_ham <- df_spam_or_ham[-train, ]
+
+head(train_spam_or_ham)
+```
+
+```{r}
+head(test_spam_or_ham)
+```
+
+#### Create and Clean Corpus and Create Term Document Matrix for Training and Test Data.
+
+```{r}
+# corpus creation
+train_corpus <- Corpus (VectorSource(train_spam_or_ham$text)) # corpus training data
+test_corpus <- Corpus(VectorSource(test_spam_or_ham$text)) # corpus test data
+
+# corpus cleaning
+train_corpus <- train_corpus %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(stripWhitespace)
+```
+
+```{r}
+test_corpus <- test_corpus %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(removeWords, stopwords()) %>%
+  tm_map(stripWhitespace)
+```
+
+```{r}
+train_tdm <- DocumentTermMatrix(train_corpus)
+test_tdm <- DocumentTermMatrix(test_corpus)
+
+train_tdm
+```
+
+```{r}
+test_tdm
+```
+
+```{r}
+train_corpus
+```
+
+```{r}
+test_corpus
+```
+
+#### Separate training data to spam and ham.
+
+```{r}
+spam <- subset(train_spam_or_ham, email == "spam")
+ham <- subset(train_spam_or_ham, email == "ham")
+```
+
+#### If we run all the observation in my data, R doesnt have enough memory to execute it at the moment. So, I am going to narrow down the observations by selecting words that uses at least 50 times in the training document.
+
+
+```{r}
+fifty_times_words<- findFreqTerms(train_tdm, 50)
+length(fifty_times_words)
+```
+#### Create a classifier for each email.
+
+```{r}
+train_tdm_2<- DocumentTermMatrix(train_corpus, control=list(dictionary = fifty_times_words))
+
+test_tdm_2<- DocumentTermMatrix(test_corpus, control=list(dictionary = fifty_times_words))
+```
+
+#### **Model Development**
+
+#### Create a classifier for each email.
+
+```{r}
+# This is required in order to set the classifier for naiveBayes
+
+class(train_tdm_2)
+```
+#### Train the model. 
+
+```{r}
+train_tdm_3 <- as.matrix(train_tdm_2)
+train_tdm_3 <- as.data.frame(train_tdm_3)
+class(train_tdm_3)
+```
+
+```{r}
+classifier <- naiveBayes(train_tdm_3, factor(train_spam_or_ham$email))
+```
+
+```{r}
+class(classifier)
+```
+#### Test the model. 
+
+```{r}
+class(test_tdm_2)
+```
+
+```{r}
+test_tdm_3 <- as.matrix(test_tdm_2)
+test_tdm_3 <- as.data.frame(test_tdm_3)
+class(test_tdm_3)
+```
+### **PREDICTION**
+
+#### We can use the predict function to test the model on new data. " test_pred <- predict(classifier, newdata=test_tdm_3)".
+
+```{r}
+test_pred <- predict(classifier, newdata=test_tdm_3)
+```
+
+```{r}
+table(predicted=test_pred,actual=test_tdm_3[,1])
+```
+
+### **CONCLUSION**
+
+#### The Result: We are able to generate prediction of email being ham or spam (using supervised technique -naive Bayes method). We can further test it against the raw data and evaluate model’s performance.
+
+#### I first ran into problem when I loaded the url from the website provided by the professor. Codes were running well until I started to create the Corpus. I then had to load the file from my computer which workded out very well with all the codes. Since most of the codes took longer to run I had to change the class type to make the classifier work. 
+
